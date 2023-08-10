@@ -1,0 +1,19 @@
+import express from 'express';
+import { historiCreateScheme, historiUpdateScheme } from '../schemes/pengembalian.scheme.js';
+import { handleValidate } from '../middlewares/handleValidate.js';
+import {  } from '../controllers/pengembalian.controller.js';
+import { createHistori, deleteHistori, getHistori, getHistoris, updateHistori } from '../controllers/histori.controller.js';
+
+const router = express.Router();
+
+router.get('/histori', getHistori);
+
+router.get('/histori/:id', getHistoris);
+
+router.post('/histori', handleValidate(historiCreateScheme), createHistori);
+
+router.patch('/histori/:id', handleValidate(historiUpdateScheme), updateHistori);
+
+router.delete('/histori/:id', deleteHistori);
+
+export default router;
