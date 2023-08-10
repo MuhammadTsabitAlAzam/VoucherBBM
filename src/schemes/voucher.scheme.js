@@ -35,7 +35,7 @@ export const voucherCreateScheme = Joi.object({
   nama: nama.required(),
   bagian: bagian.required(),
   tanggal_pengambilan : tanggal_pengambilan.required(),
-  tanggal_pengembalian : tanggal_pengembalian.required(),
+  tanggal_pengembalian : tanggal_pengembalian.optional(),
   dualima : dualima.optional(),
   limapuluh : limapuluh.optional(),
   seratus : seratus.optional()
