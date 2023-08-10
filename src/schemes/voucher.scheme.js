@@ -12,9 +12,9 @@ const bagian = Joi.string().min(5).max(50).messages({
   'string.max': 'The bagian must be less than or equal to 50'
 });
 
-const tanggal_pengambilan = Joi.string().required();
+const tanggal_pengambilan = Joi.date().required();
 
-const tanggal_pengembalian = Joi.string().optional();
+const tanggal_pengembalian = Joi.date().optional();
 
 const dualima = Joi.number().integer().optional().messages({
   'number.base': 'The dualima must be a number',
