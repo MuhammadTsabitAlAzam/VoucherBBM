@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
-import pengambilanRoute from './routes/pengembalian.route.js';
-import pengembalianRoute from './routes/pengambilan.route.js';
+import voucherRoute from './routes/voucher.route.js';
+import historiRoute from './routes/histori.route.js';
 
 const app = express();
 
@@ -21,8 +21,8 @@ app.use(cors(corsOptions));
 
 app.use(express.json());
 
-app.use('/api', pengambilanRoute);
-app.use('/api', pengembalianRoute);
+app.use('/api', voucherRoute);
+app.use('/api', historiRoute);
 
 app.use((req, res) => res.status(404).json({ message: 'ENDPOINT NOT FOUND.' }));
 
