@@ -14,7 +14,7 @@ const bagian = Joi.string().min(5).max(50).messages({
 
 const tanggal_pengambilan = Joi.date().required();
 
-const tanggal_pengembalian = Joi.date().optional();
+// const tanggal_pengembalian = Joi.date().optional();
 
 const dualima = Joi.number().integer().optional().messages({
   'number.base': 'The dualima must be a number',
@@ -35,7 +35,7 @@ export const voucherCreateScheme = Joi.object({
   nama: nama.required(),
   bagian: bagian.required(),
   tanggal_pengambilan : tanggal_pengambilan.required(),
-  tanggal_pengembalian : tanggal_pengembalian.optional(),
+  // tanggal_pengembalian : tanggal_pengembalian.optional(),
   dualima : dualima.optional(),
   limapuluh : limapuluh.optional(),
   seratus : seratus.optional()
@@ -45,7 +45,7 @@ export const voucherUpdateScheme = Joi.object({
   nama: nama,
   bagian: bagian,
   tanggal_pengambilan : tanggal_pengambilan,
-  tanggal_pengembalian : tanggal_pengembalian,
+  // tanggal_pengembalian : tanggal_pengembalian,
   dualima : dualima,
   limapuluh : limapuluh,
   seratus : seratus
