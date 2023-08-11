@@ -12,7 +12,7 @@ const bagian = Joi.string().min(5).max(50).messages({
   'string.max': 'The bagian must be less than or equal to 50'
 });
 
-const tanggal_pengambilan = Joi.date().required();
+const tanggal_pengambilan = Joi.date().optional();
 
 const tanggal_pengembalian = Joi.date().optional();
 
