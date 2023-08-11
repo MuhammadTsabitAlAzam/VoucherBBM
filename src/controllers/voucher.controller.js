@@ -89,7 +89,7 @@ export const updateVoucher = async (req, res) => {
 
   try {
     
-    const [result] = await pool.query('UPDATE pengambilan SET nama=IFNULL(?, nama), bagian=IFNULL(?, bagian), tanggal_pengambilan=IFNULL(?, tanggal_pengambilan), tanggal_pengembalian=IFNULL(?, tanggal_pengembalian), dualima=IFNULL(?, dualima), limapuluh=IFNULL(?, limapuluh), seratus=IFNULL(?, seratus) WHERE id=?', [nama, bagian, tanggal_pengambilan, tanggal_pengembalian, dualima, limapuluh, seratus, id]);
+    const [result] = await pool.query('UPDATE voucher SET nama=IFNULL(?, nama), bagian=IFNULL(?, bagian), tanggal_pengambilan=IFNULL(?, tanggal_pengambilan), tanggal_pengembalian=IFNULL(?, tanggal_pengembalian), dualima=IFNULL(?, dualima), limapuluh=IFNULL(?, limapuluh), seratus=IFNULL(?, seratus) WHERE id=?', [nama, bagian, tanggal_pengambilan, tanggal_pengembalian, dualima, limapuluh, seratus, id]);
 
     const [rows] = await pool.query('SELECT * FROM voucher WHERE id=?', [id]);
 
