@@ -1,12 +1,12 @@
 import Joi from 'joi';
 
-const nama = Joi.string().min(3).max(50).messages({
+const nama = Joi.string().min(2).max(50).messages({
   'string.base': 'The nama must be a string',
   'string.min': 'The nama must be larger than or equal to 3',
   'string.max': 'The nama must be less than or equal to 50'
 });
 
-const bagian = Joi.string().min(5).max(50).messages({
+const bagian = Joi.string().min(2).max(50).messages({
   'string.base': 'The bagian must be a string',
   'string.min': 'The bagian must be larger than or equal to 5',
   'string.max': 'The bagian must be less than or equal to 50'
