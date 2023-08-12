@@ -19,6 +19,39 @@ export const getHistori = async (req, res) => {
   }
 };
 
+export const getHistoriAmbil = async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM histori WHERE jenis = ?', ['Ambil']);
+
+    (rows.length <= 0)
+      ? res.status(404).json({ message: 'Data histori Ambil Tidak Ditemukan.' })
+      : res.json({
+          success: true,
+          data: rows
+        });
+
+  } catch (error) {
+    return res.status(500).json({ message: 'SOMETHING GOES WRONG.' });
+  }
+};
+
+export const getHistoriKembali = async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM histori WHERE jenis = ?', ['Kembali']);
+
+    (rows.length <= 0)
+      ? res.status(404).json({ message: 'Data histori Ambil Tidak Ditemukan.' })
+      : res.json({
+          success: true,
+          data: rows
+        });
+
+  } catch (error) {
+    return res.status(500).json({ message: 'SOMETHING GOES WRONG.' });
+  }
+};
+
+
 export const getHistoris= async (req, res) => {
 
   const { id } = req.params;
