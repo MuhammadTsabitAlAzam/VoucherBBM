@@ -19,6 +19,24 @@ export const getHistori = async (req, res) => {
   }
 };
 
+export const getHistoriData = async (req, res) => {
+  const currentPage = req.query.page || 1;
+  const itemsPerPage = 10;
+  const offset = (currentPage - 1) * itemsPerPage;
+
+  try {
+    const [rows] = await pool.query('SELECT * FROM histori LIMIT ? OFFSET ?', [itemsPerPage, offset]);
+
+    res.json({
+      success: true,
+      data: rows
+    });
+  } catch (error) {
+    return res.status(500).json({ message: 'SOMETHING GOES WRONG.' });
+  }
+};
+
+
 
 export const getHistoris= async (req, res) => {
 
