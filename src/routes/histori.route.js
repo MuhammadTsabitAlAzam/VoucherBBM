@@ -10,6 +10,8 @@ router.get('/histori', getHistori);
 
 router.get('/histori/:id', getHistoris);
 
+router.get('/historiss', getHistoriData);
+
 router.post('/histori', handleValidate(historiCreateScheme), createHistori);
 
 router.patch('/histori/:id', handleValidate(historiUpdateScheme), updateHistori);
