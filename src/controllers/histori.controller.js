@@ -1,10 +1,28 @@
 import { pool } from '../db/db.js';
 
 export const getHistori = async (req, res) => {
- 
-  try {
+  const { jenis, tahun, bulan } = req.query;
 
-    const [rows] = await pool.query('SELECT * FROM histori');
+  let query = 'SELECT * FROM histori';
+
+  const queryParams = [];
+  if (jenis) {
+    query += ' WHERE jenis = ?';
+    queryParams.push(jenis);
+  }
+
+  if (tahun && bulan) {
+    if (queryParams.length > 0) {
+      query += ' AND';
+    } else {
+      query += ' WHERE';
+    }
+    query += ' YEAR(tanggal) = ? AND MONTH(tanggal) = ?';
+    queryParams.push(tahun, bulan);
+  }
+
+  try {
+    const [rows] = await pool.query(query, queryParams);
 
     (rows.length <= 0)
       ? res.status(404).json({ message: 'Data histori Tidak Ditemukan.' })
@@ -14,83 +32,10 @@ export const getHistori = async (req, res) => {
         });
 
   } catch (error) {
-
     return res.status(500).json({ message: 'SOMETHING GOES WRONG.' });
   }
 };
 
-export const getHistoriAmbil = async (req, res) => {
-  try {
-    const [rows] = await pool.query('SELECT * FROM histori WHERE jenis = ?', ['Ambil']);
-
-    (rows.length <= 0)
-      ? res.status(404).json({ message: 'Data histori Ambil Tidak Ditemukan.' })
-      : res.json({
-          success: true,
-          data: rows
-        });
-
-  } catch (error) {
-    return res.status(500).json({ message: 'SOMETHING GOES WRONG.' });
-  }
-};
-
-export const getHistoriKembali = async (req, res) => {
-  try {
-    const [rows] = await pool.query('SELECT * FROM histori WHERE jenis = ?', ['Kembali']);
-
-    (rows.length <= 0)
-      ? res.status(404).json({ message: 'Data histori Ambil Tidak Ditemukan.' })
-      : res.json({
-          success: true,
-          data: rows
-        });
-
-  } catch (error) {
-    return res.status(500).json({ message: 'SOMETHING GOES WRONG.' });
-  }
-};
-
-export const getHistoriByMonth = async (req, res) => {
-  const { year, month } = req.params;
-
-  try {
-    const [rows] = await pool.query('SELECT * FROM histori WHERE YEAR(tanggal) = ? AND MONTH(tanggal) = ?', [year, month]);
-
-    (rows.length <= 0)
-      ? res.status(404).json({ message: 'Data histori untuk bulan dan tahun ini Tidak Ditemukan.' })
-      : res.json({
-        success: true,
-        data: rows
-      });
-
-  } catch (error) {
-    return res.status(500).json({ message: 'SOMETHING GOES WRONG.' });
-  }
-};
-
-
-
-export const getHistoris= async (req, res) => {
-
-  const { id } = req.params;
-
-  try {
-
-    const [rows] = await pool.query('SELECT * FROM histori WHERE id=?', [id]);
-
-    (rows.length <= 0)
-      ? res.status(404).json({ message: 'Data histori Tidak Ditemukan.' })
-      : res.json({ 
-          success: true,
-          data: rows
-        });
-
-  } catch (error) {
-
-    return res.status(500).json({ message: 'SOMETHING GOES WRONG.' });
-  }
-};
 
 
 export const createHistori = async (req, res) => {
