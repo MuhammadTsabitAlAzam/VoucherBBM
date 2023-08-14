@@ -75,33 +75,40 @@ export const getHistoris= async (req, res) => {
 
 
 export const createHistori = async (req, res) => {
-
   const { nama, bagian, tanggal, dualima, limapuluh, seratus, jenis } = req.body;
 
   try {
-    
-    const [rows] = await pool.query('INSERT INTO histori (nama, bagian, tanggal, dualima, limapuluh, seratus, jenis) VALUES (?, ?, ?, ?, ?, ?, ?)', [nama, bagian, tanggal, dualima, limapuluh, seratus, jenis]);
+    // Hitung nilai jumlah berdasarkan nilai yang diberikan
+    const jumlah = dualima * 25000 + limapuluh * 50000 + seratus * 100000;
+
+    const [rows] = await pool.query(
+      'INSERT INTO histori (nama, bagian, tanggal, dualima, limapuluh, seratus, jenis, jumlah) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [nama, bagian, tanggal, dualima, limapuluh, seratus, jenis, jumlah]
+    );
 
     res.json({ 
       success: true,
-      data: { id: rows.insertId, nama, bagian, tanggal, dualima, limapuluh, seratus, jenis }
+      data: { id: rows.insertId, nama, bagian, tanggal, dualima, limapuluh, seratus, jenis, jumlah }
     });
-
- } catch (error) {
-    
-    return res.status(500).json({ message: 'SOMETHING GOES WRONG.' });
- }
+  } catch (error) {
+    return res.status(500).json({ message: 'TERJADI MASALAH.' });
+  }
 };
 
 
-export const updateHistori = async (req, res) => {
 
+export const updateHistori = async (req, res) => {
   const { id } = req.params;
   const { nama, bagian, tanggal, dualima, limapuluh, seratus, jenis } = req.body;
 
   try {
-    
-    const [result] = await pool.query('UPDATE histori SET nama=IFNULL(?, nama), bagian=IFNULL(?, bagian), tanggal=IFNULL(?, tanggal), dualima=IFNULL(?, dualima), limapuluh=IFNULL(?, limapuluh), seratus=IFNULL(?, seratus), jenis=IFNULL(?, jenis) WHERE id=?', [nama, bagian, tanggal, dualima, limapuluh, seratus, jenis, id]);
+    // Hitung nilai jumlah yang diperbarui berdasarkan nilai yang diberikan
+    const jumlah = dualima * 25000 + limapuluh * 50000 + seratus * 100000;
+
+    const [result] = await pool.query(
+      'UPDATE histori SET nama=IFNULL(?, nama), bagian=IFNULL(?, bagian), tanggal=IFNULL(?, tanggal), dualima=IFNULL(?, dualima), limapuluh=IFNULL(?, limapuluh), seratus=IFNULL(?, seratus), jenis=IFNULL(?, jenis), jumlah=? WHERE id=?',
+      [nama, bagian, tanggal, dualima, limapuluh, seratus, jenis, jumlah, id]
+    );
 
     const [rows] = await pool.query('SELECT * FROM histori WHERE id=?', [id]);
 
@@ -111,10 +118,8 @@ export const updateHistori = async (req, res) => {
         success: true,
         data: rows[0]
       });
-
   } catch (error) {
-    
-    return res.status(500).json({ message: 'SOMETHING GOES WRONG.' });
+    return res.status(500).json({ message: 'TERJADI MASALAH.' });
   }
 };
 
