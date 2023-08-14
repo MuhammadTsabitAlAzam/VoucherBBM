@@ -11,14 +11,24 @@ export const getHistori = async (req, res) => {
     queryParams.push(jenis);
   }
 
-  if (tahun && bulan) {
+  if (tahun) {
     if (queryParams.length > 0) {
       query += ' AND';
     } else {
       query += ' WHERE';
     }
-    query += ' YEAR(tanggal) = ? AND MONTH(tanggal) = ?';
-    queryParams.push(tahun, bulan);
+    query += ' YEAR(tanggal) = ?';
+    queryParams.push(tahun);
+  }
+
+  if (bulan) {
+    if (queryParams.length > 0) {
+      query += ' AND';
+    } else {
+      query += ' WHERE';
+    }
+    query += ' MONTH(tanggal) = ?';
+    queryParams.push(bulan);
   }
 
   try {
@@ -35,6 +45,7 @@ export const getHistori = async (req, res) => {
     return res.status(500).json({ message: 'SOMETHING GOES WRONG.' });
   }
 };
+
 
 
 
