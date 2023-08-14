@@ -51,6 +51,25 @@ export const getHistoriKembali = async (req, res) => {
   }
 };
 
+export const getHistoriByMonth = async (req, res) => {
+  const { year, month } = req.params;
+
+  try {
+    const [rows] = await pool.query('SELECT * FROM histori WHERE YEAR(tanggal) = ? AND MONTH(tanggal) = ?', [year, month]);
+
+    (rows.length <= 0)
+      ? res.status(404).json({ message: 'Data histori untuk bulan dan tahun ini Tidak Ditemukan.' })
+      : res.json({
+        success: true,
+        data: rows
+      });
+
+  } catch (error) {
+    return res.status(500).json({ message: 'SOMETHING GOES WRONG.' });
+  }
+};
+
+
 
 export const getHistoris= async (req, res) => {
 
