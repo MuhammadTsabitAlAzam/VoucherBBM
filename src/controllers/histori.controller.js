@@ -46,7 +46,80 @@ export const getHistori = async (req, res) => {
   }
 };
 
+export const downloadPDF = async (req, res) => {
+  const { jenis, tahun, bulan } = req.query;
 
+  let query = 'SELECT * FROM histori';
+
+  const queryParams = [];
+  if (jenis) {
+    query += ' WHERE jenis = ?';
+    queryParams.push(jenis);
+  }
+
+  if (tahun) {
+    if (queryParams.length > 0) {
+      query += ' AND';
+    } else {
+      query += ' WHERE';
+    }
+    query += ' YEAR(tanggal) = ?';
+    queryParams.push(tahun);
+  }
+
+  if (bulan) {
+    if (queryParams.length > 0) {
+      query += ' AND';
+    } else {
+      query += ' WHERE';
+    }
+    query += ' MONTH(tanggal) = ?';
+    queryParams.push(bulan);
+  }
+
+  try {
+    const [rows] = await pool.query(query, queryParams);
+
+    if (rows.length <= 0) {
+      return res.status(404).json({ message: 'Data histori Tidak Ditemukan.' });
+    }
+
+    // Create a PDF document
+    const pdfDoc = new PDFDocument();
+    // Set response headers for PDF download
+    res.setHeader('Content-Disposition', 'attachment; filename="laporan.pdf"');
+    res.setHeader('Content-Type', 'application/pdf');
+    // Pipe the PDF document to the response stream
+    pdfDoc.pipe(res);
+
+    // Initialize total jumlah
+    let totalJumlah = 0;
+
+    // Loop through the histori data and add to the PDF
+    rows.forEach((histori, index) => {
+      pdfDoc.fontSize(12).text(`Data ${index + 1}:`, { underline: true });
+      pdfDoc.fontSize(10).text(`Nama: ${histori.nama}`);
+      pdfDoc.fontSize(10).text(`Bagian: ${histori.bagian}`);
+      pdfDoc.fontSize(10).text(`Tanggal: ${histori.tanggal}`);
+      pdfDoc.fontSize(10).text(`Jenis: ${histori.jenis}`);
+      pdfDoc.fontSize(10).text(`Jumlah: ${histori.jumlah}`);
+      pdfDoc.moveDown(1);
+
+      // Add to the total jumlah
+      totalJumlah += histori.jumlah;
+    });
+
+    // Display total jumlah at the bottom
+    pdfDoc.fontSize(12).text('Total Jumlah:', { underline: true });
+    pdfDoc.fontSize(10).text(`Total: ${totalJumlah}`);
+
+    // Finalize the PDF and end the response stream
+    pdfDoc.end();
+
+  } catch (error) {
+    return res.status(500).json({ message: 'SOMETHING GOES WRONG.' });
+  }
+};
 
 
 export const createHistori = async (req, res) => {
