@@ -85,36 +85,44 @@ export const downloadPDF = async (req, res) => {
       return res.status(404).json({ message: 'Data histori Tidak Ditemukan.' });
     }
 
-    // Create a PDF document
     const pdfDoc = new PDFDocument();
-    // Set response headers for PDF download
     res.setHeader('Content-Disposition', 'attachment; filename="laporan.pdf"');
     res.setHeader('Content-Type', 'application/pdf');
-    // Pipe the PDF document to the response stream
     pdfDoc.pipe(res);
 
-    // Initialize total jumlah
+    // Create a table for the data
+    const table = {
+      headers: ['No', 'Nama', 'Bagian', 'Tanggal', 'Jenis', 'Jumlah'],
+      rows: [],
+    };
+
     let totalJumlah = 0;
 
-    // Loop through the histori data and add to the PDF
     rows.forEach((histori, index) => {
-      pdfDoc.fontSize(12).text(`Data ${index + 1}:`, { underline: true });
-      pdfDoc.fontSize(10).text(`Nama: ${histori.nama}`);
-      pdfDoc.fontSize(10).text(`Bagian: ${histori.bagian}`);
-      pdfDoc.fontSize(10).text(`Tanggal: ${histori.tanggal}`);
-      pdfDoc.fontSize(10).text(`Jenis: ${histori.jenis}`);
-      pdfDoc.fontSize(10).text(`Jumlah: ${histori.jumlah}`);
-      pdfDoc.moveDown(1);
+      const rowData = [
+        index + 1,
+        histori.nama,
+        histori.bagian,
+        histori.tanggal,
+        histori.jenis,
+        histori.jumlah,
+      ];
 
-      // Add to the total jumlah
+      table.rows.push(rowData);
       totalJumlah += histori.jumlah;
     });
 
-    // Display total jumlah at the bottom
+    // Create the table layout
+    pdfDoc.table(table, {
+      prepareHeader: () => pdfDoc.fontSize(12),
+      prepareRow: (row, i) => pdfDoc.fontSize(10),
+      // Add more styling options here if needed
+    });
+
+    pdfDoc.moveDown(1);
     pdfDoc.fontSize(12).text('Total Jumlah:', { underline: true });
     pdfDoc.fontSize(10).text(`Total: ${totalJumlah}`);
 
-    // Finalize the PDF and end the response stream
     pdfDoc.end();
 
   } catch (error) {
