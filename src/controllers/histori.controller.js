@@ -1,17 +1,18 @@
 import { pool } from '../db/db.js';
-import PDFDocument from 'pdfkit';
+import PDFDocument from "pdfkit-table";
+
 
 export const getHistori = async (req, res) => {
   const { jenis, tahun, bulan } = req.query;
-
+  
   let query = 'SELECT * FROM histori';
-
+  
   const queryParams = [];
   if (jenis) {
     query += ' WHERE jenis = ?';
     queryParams.push(jenis);
   }
-
+  
   if (tahun) {
     if (queryParams.length > 0) {
       query += ' AND';
@@ -21,7 +22,7 @@ export const getHistori = async (req, res) => {
     query += ' YEAR(tanggal) = ?';
     queryParams.push(tahun);
   }
-
+  
   if (bulan) {
     if (queryParams.length > 0) {
       query += ' AND';
@@ -34,14 +35,14 @@ export const getHistori = async (req, res) => {
 
   try {
     const [rows] = await pool.query(query, queryParams);
-
+    
     (rows.length <= 0)
-      ? res.status(404).json({ message: 'Data histori Tidak Ditemukan.' })
-      : res.json({ 
-          success: true,
-          data: rows
-        });
-
+    ? res.status(404).json({ message: 'Data histori Tidak Ditemukan.' })
+    : res.json({ 
+      success: true,
+      data: rows
+    });
+    
   } catch (error) {
     return res.status(500).json({ message: 'SOMETHING GOES WRONG.' });
   }
@@ -49,15 +50,15 @@ export const getHistori = async (req, res) => {
 
 export const downloadPDF = async (req, res) => {
   const { jenis, tahun, bulan } = req.query;
-
+  
   let query = 'SELECT * FROM histori';
-
+  
   const queryParams = [];
   if (jenis) {
     query += ' WHERE jenis = ?';
     queryParams.push(jenis);
   }
-
+  
   if (tahun) {
     if (queryParams.length > 0) {
       query += ' AND';
@@ -67,7 +68,7 @@ export const downloadPDF = async (req, res) => {
     query += ' YEAR(tanggal) = ?';
     queryParams.push(tahun);
   }
-
+  
   if (bulan) {
     if (queryParams.length > 0) {
       query += ' AND';
@@ -77,58 +78,75 @@ export const downloadPDF = async (req, res) => {
     query += ' MONTH(tanggal) = ?';
     queryParams.push(bulan);
   }
-
+  
   try {
     const [rows] = await pool.query(query, queryParams);
-
+    
     if (rows.length <= 0) {
       return res.status(404).json({ message: 'Data histori Tidak Ditemukan.' });
     }
-
-    const pdfDoc = new PDFDocument();
-    res.setHeader('Content-Disposition', 'attachment; filename="laporan.pdf"');
-    res.setHeader('Content-Type', 'application/pdf');
-    pdfDoc.pipe(res);
-
-    // Create a table for the data
+    
+    let subtitle = '';
+    if (bulan && tahun) {
+      const monthNames = [
+        "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+      ];
+      subtitle = `${monthNames[parseInt(bulan) - 1]} ${tahun}`;
+    } else if (bulan) {
+      const monthNames = [
+        "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+      ];
+      subtitle = `Bulan ${monthNames[parseInt(bulan) - 1]}`;
+    } else if (tahun) {
+      subtitle = `Tahun ${tahun}`;
+    }
+    
+    let title = 'Laporan Voucher BPBD DIY';
+    if (jenis == 'Ambil'){title = 'Laporan Pengambilan Voucher BPBD DIY'}
+    else if (jenis == 'Kembali'){title = 'Laporan Pengembalian Voucher BPBD DIY'}
+    
+    let doc = new PDFDocument({ margin: 30, size: 'A4' });
     const table = {
-      headers: ['No', 'Nama', 'Bagian', 'Tanggal', 'Jenis', 'Jumlah'],
-      rows: [],
+      title: title,
+      subtitle: subtitle,
+      headers: [
+        { label: "No", property: 'no', width: 60, renderer: null },
+        { label: "Nama", property: 'nama', width: 100, renderer: null }, 
+        { label: "Bagian", property: 'bagian', width: 150, renderer: null }, 
+        { label: "Tanggal", property: 'tanggal', width: 100, renderer: null }, 
+        { label: "Jumlah", property: 'jumlah', width: 80, renderer: null }, 
+        { label: "Jenis", property: 'jenis', width: 43, renderer: null},
+      ],
+      // complex data
+      datas: rows.map((histori, index) => ({
+        no: index + 1,
+        nama: histori.nama,
+        bagian: histori.bagian,
+        tanggal: histori.tanggal,
+        jumlah: histori.jumlah,
+        jenis: histori.jenis,
+      })),
     };
 
-    let totalJumlah = 0;
-
-    rows.forEach((histori, index) => {
-      const rowData = [
-        index + 1,
-        histori.nama,
-        histori.bagian,
-        histori.tanggal,
-        histori.jenis,
-        histori.jumlah,
-      ];
-
-      table.rows.push(rowData);
-      totalJumlah += histori.jumlah;
+    doc.table(table, {
+      prepareHeader: () => doc.font("Helvetica-Bold").fontSize(8),
+      prepareRow: (row, indexColumn, indexRow, rectRow, rectCell) => {
+        doc.font("Helvetica").fontSize(8);
+        indexColumn === 0 && doc.addBackground(rectRow, 'white', 0.15);
+      },
     });
 
-    // Create the table layout
-    pdfDoc.table(table, {
-      prepareHeader: () => pdfDoc.fontSize(12),
-      prepareRow: (row, i) => pdfDoc.fontSize(10),
-      // Add more styling options here if needed
-    });
-
-    pdfDoc.moveDown(1);
-    pdfDoc.fontSize(12).text('Total Jumlah:', { underline: true });
-    pdfDoc.fontSize(10).text(`Total: ${totalJumlah}`);
-
-    pdfDoc.end();
+    doc.pipe(res);
+    // done!
+    doc.end();
 
   } catch (error) {
     return res.status(500).json({ message: 'SOMETHING GOES WRONG.' });
   }
 };
+
 
 
 export const createHistori = async (req, res) => {
