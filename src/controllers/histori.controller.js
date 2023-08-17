@@ -138,7 +138,10 @@ export const downloadPDF = async (req, res) => {
       },
     });
 
-    doc.pipe(res);
+    doc.pipe(res.writeHead(200, {
+      'Content-Type': 'application/pdf',
+      'Content-disposition': 'attachment;filename=test.pdf',})
+      );
     // done!
     doc.end();
 
