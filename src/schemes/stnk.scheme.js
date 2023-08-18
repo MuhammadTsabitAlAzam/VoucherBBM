@@ -37,7 +37,7 @@ const customDateValidation = (value, helpers) => {
 
 
 export const stnkCreateScheme = Joi.object({
-  nama_kendaraan_kendaraan: nama_kendaraan.required(),
+  nama_kendaraan: nama_kendaraan.required(),
   plat_nomor: plat_nomor.required(),
   tanggal : tanggal.required(),
 });

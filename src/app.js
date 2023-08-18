@@ -3,6 +3,7 @@ import cors from 'cors';
 import voucherRoute from './routes/voucher.route.js';
 import historiRoute from './routes/histori.route.js';
 import stnkRoute from './routes/stnk.route.js';
+import userRoute from './routes/user.routes.js';
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use(cors(corsOptions));
 
 app.use(express.json());
 
+app.use('/api', userRoute);
 app.use('/api', voucherRoute);
 app.use('/api', historiRoute);
 app.use('/api', stnkRoute);
