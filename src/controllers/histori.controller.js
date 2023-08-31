@@ -44,7 +44,7 @@ export const getHistori = async (req, res) => {
     });
     
   } catch (error) {
-    return res.status(500).json({ message: 'SOMETHING GOES WRONG.' });
+    return res.status(500).json({ error });
   }
 };
 

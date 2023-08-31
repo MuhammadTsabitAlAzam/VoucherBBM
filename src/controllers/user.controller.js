@@ -2,12 +2,14 @@ import { pool } from '../db/db.js';
 
 export const getUser = async (req, res) => {
   try {
-    const [rows] = await pool.query('SELECT * FROM user ORDER BY dayleft ASC');
+    const [rows] = await pool.query('SELECT * FROM user');
 
-    res.json({ 
-      success: true,
-      data: rows
-    });
+    (rows.length <= 0)
+      ? res.status(404).json({ message: 'Data User Tidak Ditemukan.' })
+      : res.json({ 
+          success: true,
+          data: rows
+        });
   } catch (error) {
     return res.status(500).json({ message: 'SOMETHING GOES WRONG.' });
   }

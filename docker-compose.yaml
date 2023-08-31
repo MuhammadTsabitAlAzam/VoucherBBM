@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: vbbm
+      MYSQL_PASSWORD: 123
+      MYSQL_ROOT_PASSWORD: 123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./vbbm.sql:/docker-entrypoint-initdb.d/vbbm.sql
+  web:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      DB_HOST: db
+      DB_USER: root
+      DB_PASSWORD: 123
+      DB_DATABASE: vbbm
+      SERVER_PORT: 3000
+    depends_on:
+      - db
+    volumes:
+      - ./web_data:/app/data
+volumes:
+  mysql_data:
